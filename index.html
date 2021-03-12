@@ -28,7 +28,7 @@
 
       /* [Variables] */
       --gallery__scroll-snap: x mandatory;
-      --gallery__number-of-visible-columns: 2;
+      --gallery__number-of-visible-columns: 1;
       --gallery_container-edges-spacing: 0;
       --gallery__item-size: calc( 100% / var(--gallery__number-of-visible-columns) );
     }
@@ -57,6 +57,7 @@
 
 
   <script>
+    // https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
     const $carousel = document.querySelector('#carousel');
     const $carouselChildren = [...$carousel.querySelectorAll(':scope > *')];
     const totalCarouselChildren = $carouselChildren.length
