@@ -29,7 +29,7 @@
       /* [Variables] */
       --gallery__scroll-snap: x mandatory;
       --gallery__number-of-visible-columns: 2;
-      --gallery_container-edges-spacing: 20px;
+      --gallery_container-edges-spacing: 0;
       --gallery__item-size: calc( 100% / var(--gallery__number-of-visible-columns) );
     }
 
@@ -46,33 +46,56 @@
   </style>
 
   <div id="carousel">
-    <section>#01 Slide</section>
-    <section>#02 Slide</section>
-    <section>#03 Slide</section>
-    <section>#04 Slide</section>
-    <section>#05 Slide</section>
+    <section><span>#01 Slide</span></section>
+    <section><span>#02 Slide</span></section>
+    <section><span>#03 Slide</span></section>
+    <section><span>#04 Slide</span></section>
+    <section><span>#05 Slide</span></section>
   </div>
-  <button>Prev</button>
-  <button>Next</button>
+  <button onclick="prev()" >Prev</button>
+  <button onclick="next()">Next</button>
 
 
   <script>
-    const options = {
-      root: document.querySelector('#carousel'),
-      rootMargin: '0px',
-      threshold: 1.0
+    const $carousel = document.querySelector('#carousel');
+    const $carouselChildren = [...$carousel.querySelectorAll(':scope > *')];
+    const totalCarouselChildren = $carouselChildren.length
+
+    function getCarouselData() {
+      return $carouselChildren.reduce((acc, item, index, arr) => {
+          const carouselInnerWidth = item.getBoundingClientRect().width + Number(acc.carouselInnerWidth);
+          return {
+              ...acc,
+              carouselItemIndexBySize: {
+                  ...acc.carouselItemIndexBySize,
+                  [acc.carouselInnerWidth]: index
+              },
+              carouselInnerWidth
+          }
+      }, { carouselInnerWidth: 0, carouselItemIndexBySize: [] })
     }
-    const firstItem = document.querySelector('#carousel section:first-child');
-    const lastItem = document.querySelector('#carousel section:last-child');
-
-    function callback(entries, observer) {
-      console.log(entries, observer);
+    
+    function next() {
+      const carouselData = getCarouselData();
+      const activeItem = carouselData.carouselItemIndexBySize[$carousel.scrollLeft];
+      if(typeof activeItem === 'undefined') return false;
+      
+      const $activeCarouselChild = $carouselChildren[activeItem];
+      const value = $carousel.scrollLeft + $activeCarouselChild.getBoundingClientRect().width;
+      $carousel.scrollLeft = value;
     }
 
-    const observer = new IntersectionObserver(callback, options);
+    function prev() {
+      const carouselData = getCarouselData();
+      const activeItem = carouselData.carouselItemIndexBySize[$carousel.scrollLeft];
+      if(typeof activeItem === 'undefined') return false;
+      
+      const $activeCarouselChild = $carouselChildren[activeItem];
+      const value = $carousel.scrollLeft - $activeCarouselChild.getBoundingClientRect().width;
+      $carousel.scrollLeft = value;
+    }
 
-    observer.observe(firstItem);
-    observer.observe(lastItem);
+
   </script>
 </body>
 </html>
